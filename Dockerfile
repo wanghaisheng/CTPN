@@ -1,6 +1,7 @@
 FROM nvidia/cuda:7.0-runtime-ubuntu14.04
 MAINTAINER Varun Suresh <fab.varun@gmail.com>
-
+# docker build -t dc/ctpn .
+#docker run  --rm -it -v `pwd`:/opt/ctpn/CTPN/demo_images -p 8888:8888  dc/ctpn /bin/bash
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         cmake \
@@ -105,3 +106,14 @@ RUN sudo ln /dev/null /dev/raw1394
 RUN  pip install numpy --upgrade
 WORKDIR $CTPN_ROOT/CTPN
 RUN make
+
+RUN mkdir /opt/ctpn/CTPN/output
+VOLUME ['/opt/ctpn/CTPN/output/']
+RUN pip install --upgrade jupyter
+RUN mkdir -p -m 700 /root/.jupyter/ && \
+    echo "c.NotebookApp.ip = '*'" >> /root/.jupyter/jupyter_notebook_config.py
+WORKDIR /opt/ctpn/CTPN/
+EXPOSE 8888
+CMD ["jupyter", "notebook", "--no-browser", "--allow-root"]
+
+
