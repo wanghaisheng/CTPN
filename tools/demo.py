@@ -25,7 +25,7 @@ from detectors import TextProposalDetector, TextDetector
 import os.path as osp
 from utils.timer import Timer
 
-DEMO_IMAGE_DIR="demo_images/"
+DEMO_IMAGE_DIR="demo_images/pic_folder"
 NET_DEF_FILE="models/deploy.prototxt"
 MODEL_FILE="models/ctpn_trained_model.caffemodel"
 
@@ -53,6 +53,10 @@ for im_name in demo_imnames:
 
     im, f=resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
     text_lines=text_detector.detect(im)
+
+    for i,l in enumerate(text_lines):
+        output_line = im_name+ "_%d.png" % (i+1)
+        cv2.imwrite(output_line,text_lines[i])
 
     print "Number of the detected text lines: %s"%len(text_lines)
     print "Time: %f"%timer.toc()
