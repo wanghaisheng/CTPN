@@ -1,7 +1,3 @@
-*.pyc
-*.caffemodel
-.idea
-*.so
-results
-*.xml
-
+.DS_Store
+.gitignore
+.gitignore~
