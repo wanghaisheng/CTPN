@@ -39,41 +39,39 @@ else:
 text_proposals_detector=TextProposalDetector(CaffeModel(NET_DEF_FILE, MODEL_FILE))
 text_detector=TextDetector(text_proposals_detector)
 
-demo_imnames=os.listdir(DEMO_IMAGE_DIR)
+from glob import glob
 timer=Timer()
-
-for im_name in demo_imnames:
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print "Image: %s"%im_name
-
-    im_file=osp.join(DEMO_IMAGE_DIR, im_name)
+for im_name in glob("demo_images/pic_folder/*.jpg"):
+    print im_name
+    im_file=osp.join(im_name)
     im=cv2.imread(im_file)
-
     timer.tic()
-
     im, f=resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
     text_lines,text_proposals,scores=text_detector.detect(im)
-
-    for i,l in enumerate(text_lines):
-        output_line = im_name+ "_%d.png" % (i+1)
-        cv2.imwrite(output_line,text_lines[i])
-
-    print "Number of the detected text lines: %s"%len(text_lines)
+#    text_lines=enlarge_boxes(text_lines)
     print "Time: %f"%timer.toc()
+    print text_lines
+    im_with_text_lines=draw_boxes(im, text_lines, caption=im_name, is_display=False)
+    box_count = 0
+    for box in text_lines:
+        left, top, right, bottom = box[:4]
+        img_height, img_width = im.shape[0], im.shape[1]
+        padding_x = int((right - left) / 4)
+        width = padding_x * 2 + (right - left)
+        height = (64 * width / 128)
+        padding_y = int((height - (bottom - top))/2)
+        new_left = int(max(0, left - padding_x))
+        new_right = int(min(img_width - 1, right + padding_x))
+        new_top = int(max(0, top - padding_y))
+        new_bottom = int(min(img_height - 1, bottom + padding_y))
 
-    im_with_text_lines=draw_boxes(im, text_lines, caption=im_name, wait=False)
-    for k in text_lines:
-        top,left,bottom,right,score = k 
-        crop_img = im[int(left):int(right),int(top):int(bottom)]
-        cv2.imwrite('text_lines/box_{}.jpg'.format(box_count),crop_img)
-        display(Image('text_lines/box_{}.jpg'.format(box_count)))
-        box_count += 1
-    for k in text_proposals:
-        top,left,bottom,right,score = k 
-        crop_img = im[int(left):int(right),int(top):int(bottom)]
-        cv2.imwrite('text_proposals/box_{}.jpg'.format(box_count),crop_img)
-        display(Image('text_proposals/box_{}.jpg'.format(box_count)))
-        box_count += 1        
+        crop_img = im[new_top: new_bottom, new_left: new_right]
+        #crop_img = cv2.cvtColor(crop_img,cv2.COLOR_RGB2GRAY)
+        crop_img = cv2.resize(crop_img, (300,300))
+        cv2.imwrite('demo_images/pic_folder/box_text_proposals_{}.jpg'.format(box_count),crop_img)
+        box_count += 1     
+
+
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 print "Thank you for trying our demo. Press any key to exit..."
 cv2.waitKey(0)

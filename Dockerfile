@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV CTPN_ROOT=/opt/ctpn
 WORKDIR $CTPN_ROOT
 
-RUN git clone --depth 1 https://github.com/wanghaisheng/CTPN.git
+RUN git clone https://github.com/wanghaisheng/CTPN
 WORKDIR $CTPN_ROOT/CTPN/caffe
 
 
@@ -103,17 +103,17 @@ RUN cd ~ && \
 
 
 RUN sudo ln /dev/null /dev/raw1394   
-RUN  pip install numpy --upgrade
 WORKDIR $CTPN_ROOT/CTPN
 RUN make
 
 RUN mkdir /opt/ctpn/CTPN/output
 VOLUME ['/opt/ctpn/CTPN/output/']
-RUN pip install --upgrade jupyter
+RUN pip install --upgrade jupyter 
 RUN mkdir -p -m 700 /root/.jupyter/ && \
     echo "c.NotebookApp.ip = '*'" >> /root/.jupyter/jupyter_notebook_config.py
+
+RUN  pip install numpy --upgrade  -i https://pypi.tuna.tsinghua.edu.cn/simple 
+
 WORKDIR /opt/ctpn/CTPN/
 EXPOSE 8888
 CMD ["jupyter", "notebook", "--no-browser", "--allow-root"]
-
-
