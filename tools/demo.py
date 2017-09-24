@@ -52,7 +52,7 @@ for im_name in demo_imnames:
     timer.tic()
 
     im, f=resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
-    text_lines=text_detector.detect(im)
+    text_lines,text_proposals,scores=text_detector.detect(im)
 
     for i,l in enumerate(text_lines):
         output_line = im_name+ "_%d.png" % (i+1)
@@ -62,7 +62,18 @@ for im_name in demo_imnames:
     print "Time: %f"%timer.toc()
 
     im_with_text_lines=draw_boxes(im, text_lines, caption=im_name, wait=False)
-
+    for k in text_lines:
+        top,left,bottom,right,score = k 
+        crop_img = im[int(left):int(right),int(top):int(bottom)]
+        cv2.imwrite('text_lines/box_{}.jpg'.format(box_count),crop_img)
+        display(Image('text_lines/box_{}.jpg'.format(box_count)))
+        box_count += 1
+    for k in text_proposals:
+        top,left,bottom,right,score = k 
+        crop_img = im[int(left):int(right),int(top):int(bottom)]
+        cv2.imwrite('text_proposals/box_{}.jpg'.format(box_count),crop_img)
+        display(Image('text_proposals/box_{}.jpg'.format(box_count)))
+        box_count += 1        
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 print "Thank you for trying our demo. Press any key to exit..."
 cv2.waitKey(0)
