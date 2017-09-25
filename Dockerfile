@@ -113,7 +113,12 @@ RUN mkdir -p -m 700 /root/.jupyter/ && \
     echo "c.NotebookApp.ip = '*'" >> /root/.jupyter/jupyter_notebook_config.py
 
 RUN  pip install numpy --upgrade  -i https://pypi.tuna.tsinghua.edu.cn/simple 
-
+RUN  pip install ipyparallel    -i https://pypi.tuna.tsinghua.edu.cn/simple 
 WORKDIR /opt/ctpn/CTPN/
 EXPOSE 8888
-CMD ["jupyter", "notebook", "--no-browser", "--allow-root"]
+
+#COPY run_jupyter.sh /
+
+#CMD ["/run_jupyter.sh", "--allow-root"]
+#CMD ["jupyter", "notebook", "--no-browser", "--allow-root"]
+CMD jupyter notebook --no-browser --ip=0.0.0.0 --allow-root
